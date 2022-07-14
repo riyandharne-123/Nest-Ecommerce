@@ -1,7 +1,5 @@
 /* eslint-disable prettier/prettier */
 import { MiddlewareConsumer, Module } from '@nestjs/common';
-import { CatalogController } from './catalog.controller';
-import { CatalogService } from './catalog.service';
 
 //Imported TypeOrmModule and UserRepository
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -13,12 +11,15 @@ import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from '../auth/jwt.strategy';
 import { SellerMiddleware } from 'src/guards/seller.guard';
 
+import { OrderService } from './order.service';
+import { OrderController } from './order.controller';
+
 import { UserRepository } from 'src/auth/user.repository';
-import { CatalogRepository } from './catalog.repository';
+import { OrderRepository } from './order.repository';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([UserRepository, CatalogRepository]),
+    TypeOrmModule.forFeature([UserRepository, OrderRepository]),
     PassportModule.register({defaultStrategy: 'jwt'}),
     JwtModule.register({
       secret: 'jwt-secret',
@@ -27,11 +28,11 @@ import { CatalogRepository } from './catalog.repository';
       }
     }),
   ],
-  controllers: [CatalogController],
-  providers: [CatalogService, JwtStrategy]
+  controllers: [OrderController],
+  providers: [JwtStrategy, OrderService]
 })
-export class CatalogModule {
+export class OrderModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(SellerMiddleware).forRoutes('api/catalog/get', 'api/catalog/create', 'api/catalog/create/item');
+    consumer.apply(SellerMiddleware).forRoutes('api/order/get');
   }
 }
